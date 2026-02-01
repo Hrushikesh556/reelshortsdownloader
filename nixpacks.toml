@@ -1,0 +1,18 @@
+# Nixpacks configuration for Railway
+[phases.setup]
+nixPkgs = ["python311", "python311Packages.pip", "ffmpeg", "nodejs_20"]
+
+[phases.install]
+cmds = [
+    "npm install",
+    "pip install yt-dlp"
+]
+
+[phases.build]
+cmds = [
+    "npm run build",
+    "cd server && npm install"
+]
+
+[start]
+cmd = "cd server && mkdir -p public/videos && cp -r ../dist/* public/ && node index.js"

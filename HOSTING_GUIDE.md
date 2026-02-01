@@ -43,45 +43,37 @@ git push -u origin main
 
 3. **Create New Project → Deploy from GitHub**
 
-4. **Add a Dockerfile** (create in root):
-```dockerfile
-FROM node:20-slim
+4. **The Dockerfile is already included!** (No need to create one)
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    ffmpeg \
-    && pip3 install yt-dlp --break-system-packages \
-    && apt-get clean
+The project includes a production-ready `Dockerfile` that:
+- Uses multi-stage build for smaller image
+- Installs Python in a virtual environment (fixes pip warnings)
+- Uses `npm install` instead of `npm ci` (fixes lockfile errors)
+- Properly installs yt-dlp and ffmpeg
+- Builds and serves the frontend from the backend
 
-WORKDIR /app
-
-# Copy and install backend
-COPY server/package*.json ./server/
-RUN cd server && npm install
-
-# Copy and build frontend
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-# Copy built frontend to server's public folder
-RUN cp -r dist/* server/public/ 2>/dev/null || mkdir -p server/public && cp -r dist/* server/public/
-
-WORKDIR /app/server
-EXPOSE 5000
-CMD ["node", "index.js"]
-```
-
-5. **Set Environment Variables in Railway:**
+5. **Set Environment Variables in Railway Dashboard:**
 ```
 PORT=5000
 NODE_ENV=production
 ```
 
-6. **Deploy!** Railway will build and host automatically.
+6. **Deploy!** Railway will automatically detect the Dockerfile and build.
+
+### Troubleshooting Railway:
+
+**If you still get npm errors:**
+- Rename `Dockerfile` to `Dockerfile.backup`
+- Rename `Dockerfile.simple` to `Dockerfile`
+- The simple version uses a single-stage build which is more reliable
+
+**If using Nixpacks (Railway's default):**
+The project includes `nixpacks.toml` for automatic configuration.
+
+**To use Nixpacks instead of Docker:**
+1. Go to Railway Dashboard → Settings
+2. Change Builder from "Dockerfile" to "Nixpacks"
+3. Redeploy
 
 ---
 

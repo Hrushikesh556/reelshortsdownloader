@@ -1,0 +1,15 @@
+# Render.com Blueprint
+# Deploy: Connect repo → Auto-detects this file
+
+services:
+  - type: web
+    name: reel-downloader
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter # $7/month - required for yt-dlp
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
